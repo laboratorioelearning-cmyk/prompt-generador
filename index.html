@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prompt Generator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="card">
+    <h1>Generador de Prompts Efectivos</h1>
+    <p class="hint">Completa los campos y genera un prompt listo para copiar.</p>
+
+    <div class="grid">
+      <label>Tema
+        <input id="tema" placeholder="Ej: RAG para estudiantes" />
+      </label>
+
+      <label>Objetivo
+        <input id="objetivo" placeholder="Ej: Crear una clase de 10 minutos" />
+      </label>
+
+      <label>Audiencia
+        <input id="audiencia" placeholder="Ej: Universitarios (1er semestre)" />
+      </label>
+
+      <label>Formato de salida
+        <select id="formato">
+          <option value="pasos">Pasos</option>
+          <option value="tabla">Tabla</option>
+          <option value="bullet">Lista con viñetas</option>
+          <option value="rubrica">Rúbrica de evaluación</option>
+        </select>
+      </label>
+
+      <label>Restricciones (opcional)
+        <input id="restricciones" placeholder="Ej: Máximo 150 palabras, tono claro" />
+      </label>
+    </div>
+
+    <div class="actions">
+      <button id="btnGenerar">Generar prompt</button>
+      <button id="btnCopiar" class="secondary" disabled>Copiar</button>
+      <button id="btnLimpiar" class="secondary">Limpiar</button>
+    </div>
+
+    <label>Prompt generado</label>
+    <textarea id="salida" rows="10" readonly></textarea>
+
+    <footer class="footer">
+      <span id="msg"></span>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
