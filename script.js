@@ -1,71 +1,45 @@
-const $ = (id) => document.getElementById(id);
+import { loadSettings } from "./services/storage.js";
+import { renderBuilder } from "./pages/builder.js";
+import { renderTemplates } from "./pages/templates.js";
+import { renderEvaluator } from "./pages/evaluator.js";
+import { renderSimulator } from "./pages/simulator.js";
+import { renderHistory } from "./pages/history.js";
 
-const tema = $("tema");
-const objetivo = $("objetivo");
-const audiencia = $("audiencia");
-const formato = $("formato");
-const restricciones = $("restricciones");
-const salida = $("salida");
-const msg = $("msg");
+const container = document.getElementById("viewContainer");
+const title = document.getElementById("viewTitle");
+const description = document.getElementById("viewDescription");
+const nav = document.getElementById("navLinks");
 
-const btnGenerar = $("btnGenerar");
-const btnCopiar = $("btnCopiar");
-const btnLimpiar = $("btnLimpiar");
+const viewConfig = {
+  builder: ["Prompt Builder", "Construye prompts profesionales para docencia universitaria en minutos."],
+  templates: ["Biblioteca de Plantillas", "Usa plantillas predefinidas para acelerar tareas académicas frecuentes."],
+  evaluator: ["Evaluador de Prompts", "Evalúa calidad, claridad y precisión con una rúbrica automatizada."],
+  simulator: ["Simulador / Entrenamiento Docente", "Practica con retos de prompting y recibe retroalimentación inmediata."],
+  history: ["Historial y Exportación", "Gestiona prompts guardados: filtra, copia, exporta y elimina registros."]
+};
 
-function formatoTexto(v) {
-  const map = {
-    pasos: "en pasos numerados",
-    tabla: "en una tabla",
-    bullet: "en viñetas",
-    rubrica: "como una rúbrica con criterios y puntaje"
-  };
-  return map[v] || "de forma clara";
+const appState = {
+  settings: loadSettings(),
+  navigate,
+  refreshHistory: null
+};
+
+function navigate(view) {
+  const [t, d] = viewConfig[view];
+  title.textContent = t;
+  description.textContent = d;
+
+  [...nav.querySelectorAll("button")].forEach((b) => b.classList.toggle("active", b.dataset.view === view));
+
+  if (view === "builder") renderBuilder(container, appState);
+  if (view === "templates") renderTemplates(container, appState);
+  if (view === "evaluator") renderEvaluator(container);
+  if (view === "simulator") renderSimulator(container);
+  if (view === "history") appState.refreshHistory = renderHistory(container);
 }
 
-btnGenerar.addEventListener("click", () => {
-  const t = tema.value.trim();
-  const o = objetivo.value.trim();
-  const a = audiencia.value.trim();
-  const r = restricciones.value.trim();
-
-  if (!t || !o || !a) {
-    msg.textContent = "Completa al menos: Tema, Objetivo y Audiencia.";
-    return;
-  }
-
-  const prompt =
-`Actúa como un experto docente y diseñador instruccional.
-Tema: ${t}
-Objetivo: ${o}
-Audiencia: ${a}
-
-Entrega la respuesta ${formatoTexto(formato.value)}.
-Incluye: explicación breve, 2-3 ejemplos y una mini actividad para evaluar comprensión.
-${r ? `Restricciones: ${r}` : ""}
-
-Antes de responder, si falta información crítica, haz 2 preguntas de aclaración.`;
-
-  salida.value = prompt;
-  btnCopiar.disabled = false;
-  msg.textContent = "Prompt generado. Puedes copiarlo.";
+nav.addEventListener("click", (event) => {
+  if (event.target.matches("button[data-view]")) navigate(event.target.dataset.view);
 });
 
-btnCopiar.addEventListener("click", async () => {
-  try {
-    await navigator.clipboard.writeText(salida.value);
-    msg.textContent = "Copiado al portapapeles ✅";
-  } catch {
-    msg.textContent = "No pude copiar automáticamente. Selecciona y copia manualmente.";
-  }
-});
-
-btnLimpiar.addEventListener("click", () => {
-  tema.value = "";
-  objetivo.value = "";
-  audiencia.value = "";
-  restricciones.value = "";
-  formato.value = "pasos";
-  salida.value = "";
-  btnCopiar.disabled = true;
-  msg.textContent = "";
-});
+navigate("builder");
